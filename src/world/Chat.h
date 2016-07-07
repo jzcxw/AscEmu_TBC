@@ -204,6 +204,12 @@ class SERVER_DECL ChatHandler : public Singleton<ChatHandler>
 
     ChatCommand* getCommandTable();
 
+    //helper
+    Player* GetSelectedPlayer(WorldSession* m_session, bool showerror = true, bool auto_self = false);
+    Creature* GetSelectedCreature(WorldSession* m_session, bool showerror = true);
+    Unit* GetSelectedUnit(WorldSession* m_session, bool showerror = true);
+    uint32 GetSelectedWayPointId(WorldSession* m_session);
+
     // AccountCommands
     bool HandleAccountCreate(const char* args, WorldSession* m_session);
     bool HandleAccountChangePassword(const char* args, WorldSession* m_session);
@@ -271,21 +277,22 @@ class SERVER_DECL ChatHandler : public Singleton<ChatHandler>
     bool HandleGetUint32ValueCommand(const char* args, WorldSession* m_session);
 
     //WayPoint Commands
-    bool HandleWPAddCommand(const char* args, WorldSession *m_session);
-    bool HandleWPShowCommand(const char* args, WorldSession *m_session);
-    bool HandleWPHideCommand(const char* args, WorldSession *m_session);
-    bool HandleWPDeleteCommand(const char* args, WorldSession *m_session);
-    bool HandleWPFlagsCommand(const char* args, WorldSession *m_session);
-    bool HandleWPMoveHereCommand(const char* args, WorldSession *m_session);
-    bool HandleWPWaitCommand(const char* args, WorldSession *m_session);
-    bool HandleWPEmoteCommand(const char* args, WorldSession *m_session);
-    bool HandleWPSkinCommand(const char* args, WorldSession *m_session);
-    bool HandleWPChangeNoCommand(const char* args, WorldSession *m_session);
-    bool HandleWPInfoCommand(const char* args, WorldSession *m_session);
-    bool HandleWPMoveTypeCommand(const char* args, WorldSession *m_session);
-    bool HandleSaveWaypoints(const char* args, WorldSession * m_session);
-    bool HandleGenerateWaypoints(const char* args, WorldSession * m_session);
-    bool HandleDeleteWaypoints(const char* args, WorldSession * m_session);
+    bool HandleWayPointAddCommand(const char* args, WorldSession* m_session);
+    bool HandleWayPointAddFlyCommand(const char* args, WorldSession* m_session);
+    bool HandleWayPointChangeNumberCommand(const char* args, WorldSession* m_session);
+    bool HandleWayPointDeleteCommand(const char* /*args*/, WorldSession* m_session);
+    bool HandleWayPointDeleteAllCommand(const char* /*args*/, WorldSession* m_session);
+    bool HandleWayPointEmoteCommand(const char* args, WorldSession* m_session);
+    bool HandleWayPointFlagsCommand(const char* args, WorldSession* m_session);
+    bool HandleWayPointGenerateCommand(const char* args, WorldSession* m_session);
+    bool HandleWayPointHideCommand(const char* /*args*/, WorldSession* m_session);
+    bool HandleWayPointInfoCommand(const char* /*args*/, WorldSession* m_session);
+    bool HandleWayPpointMoveHereCommand(const char* /*args*/, WorldSession* m_session);
+    bool HandleWayPointMoveTypeCommand(const char* args, WorldSession* m_session);
+    bool HandleWayPointSaveCommand(const char* /*args*/, WorldSession* m_session);
+    bool HandleWayPointShowCommand(const char* args, WorldSession* m_session);
+    bool HandleWayPointSkinCommand(const char* args, WorldSession* m_session);
+    bool HandleWayPointWaitCommand(const char* args, WorldSession* m_session);
 
     // Guild commands
     bool HandleGuildMembersCommand(const char* args, WorldSession *m_session);
@@ -539,7 +546,6 @@ class SERVER_DECL ChatHandler : public Singleton<ChatHandler>
     bool HandleArenaSetTeamLeaderCommand(const char * args, WorldSession * m_session);
     bool HandleArenaResetAllRatingsCommand(const char * args, WorldSession * m_session);
     bool HandleNpcSelectCommand(const char * args, WorldSession * m_session);
-    bool HandleWaypointAddFlyCommand(const char * args, WorldSession * m_session);
     bool HandleWhisperBlockCommand(const char * args, WorldSession * m_session);
     bool HandleDispelAllCommand(const char * args, WorldSession * m_session);
     bool HandleShowItems(const char * args, WorldSession * m_session);

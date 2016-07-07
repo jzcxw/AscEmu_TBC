@@ -307,23 +307,23 @@ void CommandTableStorage::Init()
 
     static ChatCommand waypointCommandTable[] =
     {
-        { "add", 'w', &ChatHandler::HandleWPAddCommand, "Add wp at current pos", NULL, 0, 0, 0 },
-        { "show", 'w', &ChatHandler::HandleWPShowCommand, "Show wp's for creature", NULL, 0, 0, 0 },
-        { "hide", 'w', &ChatHandler::HandleWPHideCommand, "Hide wp's for creature", NULL, 0, 0, 0 },
-        { "delete", 'w', &ChatHandler::HandleWPDeleteCommand, "Delete selected wp", NULL, 0, 0, 0 },
-        { "movehere", 'w', &ChatHandler::HandleWPMoveHereCommand, "Move to this wp", NULL, 0, 0, 0 },
-        { "flags", 'w', &ChatHandler::HandleWPFlagsCommand, "Wp flags", NULL, 0, 0, 0 },
-        { "waittime", 'w', &ChatHandler::HandleWPWaitCommand, "Wait time at this wp", NULL, 0, 0, 0 },
-        { "emote", 'w', &ChatHandler::HandleWPEmoteCommand, "Emote at this wp", NULL, 0, 0, 0 },
-        { "skin", 'w', &ChatHandler::HandleWPSkinCommand, "Skin at this wp", NULL, 0, 0, 0 },
-        { "change", 'w', &ChatHandler::HandleWPChangeNoCommand, "Change at this wp", NULL, 0, 0, 0 },
-        { "info", 'w', &ChatHandler::HandleWPInfoCommand, "Show info for wp", NULL, 0, 0, 0 },
-        { "movetype", 'w', &ChatHandler::HandleWPMoveTypeCommand, "Movement type at wp", NULL, 0, 0, 0 },
-        { "generate", 'w', &ChatHandler::HandleGenerateWaypoints, "Randomly generate wps", NULL, 0, 0, 0 },
-        { "save", 'w', &ChatHandler::HandleSaveWaypoints, "Save all waypoints", NULL, 0, 0, 0 },
-        { "deleteall", 'w', &ChatHandler::HandleDeleteWaypoints, "Delete all waypoints", NULL, 0, 0, 0 },
-        { "addfly", 'w', &ChatHandler::HandleWaypointAddFlyCommand, "Adds a flying waypoint", NULL, 0, 0, 0 },
-        { NULL, '0', NULL, "", NULL, 0, 0, 0 }
+        { "add", 'w', &ChatHandler::HandleWayPointAddCommand, "Add wp for selected creature at current pos.", nullptr, 0, 0, 0 },
+        { "addfly", 'w', &ChatHandler::HandleWayPointAddFlyCommand, "Adds a flying waypoint for selected creature.", nullptr, 0, 0, 0 },
+        { "change", 'w', &ChatHandler::HandleWayPointChangeNumberCommand, "Change wp ID for selected wp.", nullptr, 0, 0, 0 },
+        { "delete", 'w', &ChatHandler::HandleWayPointDeleteCommand, "Deletes selected wp.", nullptr, 0, 0, 0 },
+        { "deleteall", 'w', &ChatHandler::HandleWayPointDeleteAllCommand, "Deletes all waypoints of selected creature.", nullptr, 0, 0, 0 },
+        { "emote", 'w', &ChatHandler::HandleWayPointEmoteCommand, "Set emote ID for selected wp.", nullptr, 0, 0, 0 },
+        { "flags", 'w', &ChatHandler::HandleWayPointFlagsCommand, "Set flags for selected wp.", nullptr, 0, 0, 0 },
+        { "generate", 'w', &ChatHandler::HandleWayPointGenerateCommand, "Randomly generate <x> wps for selected creature.", nullptr, 0, 0, 0 },
+        { "hide", 'w', &ChatHandler::HandleWayPointHideCommand, "Hide wp's for selected creature.", nullptr, 0, 0, 0 },
+        { "info", 'w', &ChatHandler::HandleWayPointInfoCommand, "Show info for selected wp.", nullptr, 0, 0, 0 },
+        { "movehere", 'w', &ChatHandler::HandleWayPpointMoveHereCommand, "Moves the selected wp to your position.", nullptr, 0, 0, 0 },
+        { "movetype", 'w', &ChatHandler::HandleWayPointMoveTypeCommand, "Change movement type for selected wp.", nullptr, 0, 0, 0 },
+        { "save", 'w', &ChatHandler::HandleWayPointSaveCommand, "Save all waypoints for selected creature.", nullptr, 0, 0, 0 },
+        { "show", 'w', &ChatHandler::HandleWayPointShowCommand, "Show wp's for selected creature <bool backwards>", nullptr, 0, 0, 0 },
+        { "skin", 'w', &ChatHandler::HandleWayPointSkinCommand, "Sets Skin ID for selected wp.", nullptr, 0, 0, 0 },
+        { "waittime", 'w', &ChatHandler::HandleWayPointWaitCommand, "Sets Wait time in ms for selected wp.", nullptr, 0, 0, 0 },
+        { nullptr, '0', nullptr, "", nullptr, 0, 0, 0 }
     };
     dupe_command_table(waypointCommandTable, _waypointCommandTable);
 
@@ -1286,6 +1286,119 @@ bool ChatHandler::CmdSetFloatField(WorldSession *m_session, uint32 field, uint32
         }
     }
     return true;
+}
+
+Player* ChatHandler::GetSelectedPlayer(WorldSession* m_session, bool showerror, bool auto_self)
+{
+    if (m_session == nullptr)
+        return nullptr;
+
+    bool is_creature = false;
+    Player* player_target = nullptr;
+    uint64 guid = m_session->GetPlayer()->GetSelection();
+    switch (GET_TYPE_FROM_GUID(guid))
+    {
+    case HIGHGUID_TYPE_PET:
+    case HIGHGUID_TYPE_UNIT:
+    {
+        is_creature = true;
+        break;
+    }
+    default:
+        break;
+    }
+
+    if (guid == 0 || is_creature)
+    {
+        if (auto_self)
+        {
+            GreenSystemMessage(m_session, "Auto-targeting self.");
+            player_target = m_session->GetPlayer();
+        }
+        else
+        {
+            if (showerror)
+                RedSystemMessage(m_session, "This command requires a selected player.");
+
+            return nullptr;
+        }
+    }
+    else
+    {
+        player_target = m_session->GetPlayer()->GetMapMgr()->GetPlayer((uint32)guid);
+    }
+
+    return player_target;
+}
+
+Creature* ChatHandler::GetSelectedCreature(WorldSession* m_session, bool showerror)
+{
+    if (m_session == nullptr)
+        return nullptr;
+
+    Creature* creature = nullptr;
+    bool is_invalid_type = false;
+    uint64 guid = m_session->GetPlayer()->GetSelection();
+
+    switch (GET_TYPE_FROM_GUID(guid))
+    {
+    case HIGHGUID_TYPE_PET:
+        creature = m_session->GetPlayer()->GetMapMgr()->GetPet(GET_LOWGUID_PART(guid));
+        break;
+
+    case HIGHGUID_TYPE_UNIT:
+        creature = m_session->GetPlayer()->GetMapMgr()->GetCreature(GET_LOWGUID_PART(guid));
+        break;
+    default:
+        is_invalid_type = true;
+        break;
+    }
+
+    if (creature == nullptr || is_invalid_type)
+    {
+        if (showerror)
+            RedSystemMessage(m_session, "This command requires a selected a creature.");
+
+        return nullptr;
+    }
+
+    return creature;
+}
+
+Unit* ChatHandler::GetSelectedUnit(WorldSession* m_session, bool showerror)
+{
+    if (m_session == nullptr || m_session->GetPlayer() == nullptr)
+        return nullptr;
+
+    uint64 guid = m_session->GetPlayer()->GetSelection();
+
+    Unit* unit = m_session->GetPlayer()->GetMapMgr()->GetUnit(guid);
+    if (unit == nullptr)
+    {
+        if (showerror)
+            RedSystemMessage(m_session, "You need to select a unit!");
+        return nullptr;
+    }
+
+    return unit;
+}
+
+uint32 ChatHandler::GetSelectedWayPointId(WorldSession* m_session)
+{
+    uint64 guid = m_session->GetPlayer()->GetSelection();
+    if (guid == 0)
+    {
+        SystemMessage(m_session, "No selection.");
+        return 0;
+    }
+
+    if (GET_TYPE_FROM_GUID(guid) != HIGHGUID_TYPE_WAYPOINT)
+    {
+        SystemMessage(m_session, "You should select a Waypoint.");
+        return 0;
+    }
+
+    return Arcemu::Util::GUID_LOPART(guid);
 }
 
 bool ChatHandler::HandleGetPosCommand(const char* args, WorldSession *m_session)

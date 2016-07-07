@@ -288,6 +288,7 @@ class SERVER_DECL AIInterface
     uint32 getCurrentWaypoint() { return m_currentWaypoint; }
     void changeWayPointID(uint32 oldwpid, uint32 newwpid);
     bool addWayPoint(Movement::WayPoint* wp);
+    bool addWayPointUnsafe(Movement::WayPoint* wp);
     bool saveWayPoints();
     bool showWayPoints(Player* pPlayer, bool Backwards);
     bool hideWayPoints(Player* pPlayer);

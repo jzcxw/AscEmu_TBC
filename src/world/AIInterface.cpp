@@ -2592,6 +2592,26 @@ bool AIInterface::addWayPoint(Movement::WayPoint* wp)
     return false;
 }
 
+bool AIInterface::addWayPointUnsafe(Movement::WayPoint* wp)
+{
+    if (!m_waypoints)
+        m_waypoints = new Movement::WayPointMap;
+    if (!wp)
+        return false;
+    if (wp->id == 0)
+        return false; //not valid id
+
+    if (m_waypoints->size() <= wp->id)
+        m_waypoints->resize(wp->id + 1);
+
+    if ((*m_waypoints)[wp->id] == NULL)
+    {
+        (*m_waypoints)[wp->id] = wp;
+        return true;
+    }
+    return false;
+}
+
 void AIInterface::changeWayPointID(uint32 oldwpid, uint32 newwpid)
 {
     if (!m_waypoints)return;
