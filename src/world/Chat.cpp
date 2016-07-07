@@ -299,7 +299,6 @@ void CommandTableStorage::Init()
         { "testlos", 'd', &ChatHandler::HandleCollisionTestLOS, "tests los", NULL, 0, 0, 0 },
         { "testindoor", 'd', &ChatHandler::HandleCollisionTestIndoor, "tests indoor", NULL, 0, 0, 0 },
         { "getheight", 'd', &ChatHandler::HandleCollisionGetHeight, "Gets height", NULL, 0, 0, 0 },
-        { "getpos", 'd', &ChatHandler::HandleGetPosCommand, "", NULL, 0, 0, 0 },
         { "getUint32Value", 'd', &ChatHandler::HandleGetUint32ValueCommand, "", NULL, 0, 0, 0 },
         { NULL, '0', NULL, "", NULL, 0, 0, 0 }
     };
@@ -1399,22 +1398,4 @@ uint32 ChatHandler::GetSelectedWayPointId(WorldSession* m_session)
     }
 
     return Arcemu::Util::GUID_LOPART(guid);
-}
-
-bool ChatHandler::HandleGetPosCommand(const char* args, WorldSession *m_session)
-{
-    if (!args || !m_session) return false;
-
-    /*if(m_session->GetPlayer()->GetSelection() == 0) return false;
-    Creature *creature = objmgr.GetCreature(m_session->GetPlayer()->GetSelection());
-
-    if(!creature) return false;
-    BlueSystemMessage(m_session, "Creature Position: \nX: %f\nY: %f\nZ: %f\n", creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ());
-    return true;*/
-
-    uint32 spell = atol(args);
-    SpellEntry *se = dbcSpell.LookupEntry(spell);
-    if (se)
-        BlueSystemMessage(m_session, "SpellIcon for %d is %d", se->Id, se->field114);
-    return true;
 }

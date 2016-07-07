@@ -222,7 +222,6 @@ class SERVER_DECL ChatHandler : public Singleton<ChatHandler>
     // Level 0 commands
     bool HandleHelpCommand(const char* args, WorldSession *m_session);
     bool HandleCommandsCommand(const char* args, WorldSession *m_session);
-    bool HandleNYICommand(const char* args, WorldSession *m_session);
     bool HandleAcctCommand(const char* args, WorldSession *m_session);
     bool HandleStartCommand(const char* args, WorldSession *m_session);
     bool HandleInfoCommand(const char* args, WorldSession *m_session);
@@ -413,7 +412,6 @@ class SERVER_DECL ChatHandler : public Singleton<ChatHandler>
     bool HandleGOScale(const char* args, WorldSession *m_session);
     bool HandleReviveStringcommand(const char* args, WorldSession* m_session);
     bool HandleMountCommand(const char* args, WorldSession* m_session);
-    bool HandleGetPosCommand(const char* args, WorldSession* m_session);
     bool HandleGetTransporterTime(const char* args, WorldSession* m_session);
     bool HandleSendItemPushResult(const char* args, WorldSession* m_session);
     bool HandleGOAnimProgress(const char * args, WorldSession * m_session);
