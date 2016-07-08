@@ -209,6 +209,7 @@ class SERVER_DECL ChatHandler : public Singleton<ChatHandler>
     Creature* GetSelectedCreature(WorldSession* m_session, bool showerror = true);
     Unit* GetSelectedUnit(WorldSession* m_session, bool showerror = true);
     uint32 GetSelectedWayPointId(WorldSession* m_session);
+    int32 GetSpellIDFromLink(const char* spelllink);
 
     // AccountCommands
     bool HandleAccountCreate(const char* args, WorldSession* m_session);
@@ -354,9 +355,7 @@ class SERVER_DECL ChatHandler : public Singleton<ChatHandler>
     bool HandleAddSkillCommand(const char* args, WorldSession *m_session);
     bool HandleAddInvItemCommand(const char* args, WorldSession *m_session);
     bool HandleResetReputationCommand(const char* args, WorldSession *m_session);
-    bool HandleLearnSkillCommand(const char* args, WorldSession *m_session);
-    bool HandleModifySkillCommand(const char* args, WorldSession *m_session);
-    bool HandleRemoveSkillCommand(const char* args, WorldSession *m_session);
+
     bool HandleNpcInfoCommand(const char* args, WorldSession *m_session);
     bool HandleEmoteCommand(const char* args, WorldSession *m_session);
     bool HandleIncreaseWeaponSkill(const char* args, WorldSession *m_session);
@@ -444,8 +443,10 @@ class SERVER_DECL ChatHandler : public Singleton<ChatHandler>
     bool HandleGlobalHonorDailyMaintenanceCommand(const char* args, WorldSession* m_session);
     bool HandleNextDayCommand(const char* args, WorldSession* m_session);
     bool HandlePVPCreditCommand(const char* args, WorldSession* m_session);
-
-    bool HandleUnlearnCommand(const char* args, WorldSession * m_session);
+    bool HandleCharUnlearnCommand(const char* args, WorldSession* m_session);
+    bool HandleCharLearnSkillCommand(const char* args, WorldSession* m_session);
+    bool HandleCharAdvanceSkillCommand(const char* args, WorldSession* m_session);
+    bool HandleCharRemoveSkillCommand(const char* args, WorldSession* m_session);
     bool HandleModifyLevelCommand(const char* args, WorldSession* m_session);
 
     // pet

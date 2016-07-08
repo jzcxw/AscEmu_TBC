@@ -542,11 +542,11 @@ void CommandTableStorage::Init()
     static ChatCommand characterCommandTable[] =
     {
         { "learn", 'm', &ChatHandler::HandleLearnCommand, "Learns spell", NULL, 0, 0, 0 },
-        { "unlearn", 'm', &ChatHandler::HandleUnlearnCommand, "Unlearns spell", NULL, 0, 0, 0 },
+        { "unlearn", 'm', &ChatHandler::HandleCharUnlearnCommand, "Unlearns spell", nullptr, 0, 0, 0 },
         { "getskillinfo", 'm', &ChatHandler::HandleGetSkillsInfoCommand, "Gets all the skills from a player", NULL, 0, 0, 0 },
-        { "learnskill", 'm', &ChatHandler::HandleLearnSkillCommand, ".learnskill <skillid> (optional) <value> <maxvalue> - Learns skill id skillid.", NULL, 0, 0, 0 },
-        { "advanceskill", 'm', &ChatHandler::HandleModifySkillCommand, "advanceskill <skillid> <amount, optional, default = 1> - Advances skill line x times..", NULL, 0, 0, 0 },
-        { "removeskill", 'm', &ChatHandler::HandleRemoveSkillCommand, ".removeskill <skillid> - Removes skill", NULL, 0, 0, 0 },
+        { "learnskill", 'm', &ChatHandler::HandleCharLearnSkillCommand, "Learns skill id skillid opt: min max.", nullptr, 0, 0, 0 },
+        { "advanceskill", 'm', &ChatHandler::HandleCharAdvanceSkillCommand, "Advances skill line x y times.", nullptr, 0, 0, 0 },
+        { "removeskill", 'm', &ChatHandler::HandleCharRemoveSkillCommand, "Removes skill.", nullptr, 0, 0, 0 },
         { "increaseweaponskill", 'm', &ChatHandler::HandleIncreaseWeaponSkill, ".increaseweaponskill <count> - Increase eqipped weapon skill x times (defaults to 1).", NULL, 0, 0, 0 },
         { "resetreputation", 'n', &ChatHandler::HandleResetReputationCommand, ".resetreputation - Resets reputation to start levels. (use on characters that were made before reputation fixes.)", NULL, 0, 0, 0 },
         { "resetspells", 'n', &ChatHandler::HandleResetSpellsCommand, ".resetspells - Resets all spells to starting spells of targeted player. DANGEROUS.", NULL, 0, 0, 0 },

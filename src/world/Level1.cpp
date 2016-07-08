@@ -480,75 +480,77 @@ bool ChatHandler::HandleModifySpeedCommand(const char* args, WorldSession *m_ses
     return true;
 }
 
-bool ChatHandler::HandleLearnSkillCommand(const char *args, WorldSession *m_session)
+//.character learnskill
+bool ChatHandler::HandleCharLearnSkillCommand(const char* args, WorldSession* m_session)
 {
-    uint32 skill, min, max;
-    min = max = 1;
-    char *pSkill = strtok((char*)args, " ");
-    if (!pSkill)
-        return false;
-    else
-        skill = atol(pSkill);
+    uint32 skill;
+    uint32 min;
+    uint32 max;
 
-    BlueSystemMessage(m_session, "Adding skill line %d", skill);
-
-    char *pMin = strtok(NULL, " ");
-    if (pMin)
+    if (sscanf(args, "%u %u %u", &skill, &min, &max) < 1)
     {
-        min = atol(pMin);
-        char *pMax = strtok(NULL, "\n");
-        if (pMax)
-            max = atol(pMax);
+        RedSystemMessage(m_session, "Command must be at least in format: .character learnskill <skillid>.");
+        RedSystemMessage(m_session, "Optional: .character learnskill <skillid> <min> <max>");
+        return true;
+    }
+
+    if (min == 0)
+        min = 1;
+
+    if (max == 0)
+        max = 1;
+
+    auto player_target = GetSelectedPlayer(m_session, true, true);
+    if (player_target == nullptr)
+        return true;
+
+    player_target->_AddSkillLine(skill, min, max);
+
+    if (player_target == m_session->GetPlayer())
+    {
+        BlueSystemMessage(m_session, "Adding skill line %d", skill);
     }
     else
     {
-        return false;
+        SystemMessage(player_target->GetSession(), "%s taught you skill line %u.", m_session->GetPlayer()->GetName(), skill);
+        BlueSystemMessage(m_session, "Skill line %u added to player: %s", skill, player_target->GetName());
+        sGMLog.writefromsession(m_session, "used add skill of %u %u %u on %s", skill, min, max, player_target->GetName());
     }
-
-    Player *plr = getSelectedChar(m_session, true);
-    if (!plr) return false;
-    if (plr->GetTypeId() != TYPEID_PLAYER) return false;
-    sGMLog.writefromsession(m_session, "used add skill of %u %u %u on %s", skill, min, max, plr->GetName());
-
-    plr->_AddSkillLine(skill, min, max);
 
     return true;
 }
 
-bool ChatHandler::HandleModifySkillCommand(const char *args, WorldSession *m_session)
+//.character advanceskill
+bool ChatHandler::HandleCharAdvanceSkillCommand(const char* args, WorldSession* m_session)
 {
-    uint32 skill, min, max;
-    min = max = 1;
-    char *pSkill = strtok((char*)args, " ");
-    if (!pSkill)
-        return false;
-    else
-        skill = atol(pSkill);
+    uint32 skill;
+    uint32 amount;
 
-    char *pMin = strtok(NULL, " ");
-    uint32 cnt = 0;
-    if (!pMin)
-        cnt = 1;
-    else
-        cnt = atol(pMin);
+    if (sscanf(args, "%u %u", &skill, &amount) < 1)
+    {
+        RedSystemMessage(m_session, "Command must be at least in format: .character advanceskill <skillid>.");
+        RedSystemMessage(m_session, "Optional: .character advanceskill <skillid> <amount>");
+        return true;
+    }
 
-    skill = atol(pSkill);
+    if (amount == 0)
+        amount = 1;
 
-    BlueSystemMessage(m_session, "Modifying skill line %d. Advancing %d times.", skill, cnt);
+    auto player_target = GetSelectedPlayer(m_session, true, true);
+    if (player_target == nullptr)
+        return true;
 
-    Player *plr = getSelectedChar(m_session, true);
-    if (!plr) plr = m_session->GetPlayer();
-    if (!plr) return false;
-    sGMLog.writefromsession(m_session, "used modify skill of %u %u on %s", skill, cnt, plr->GetName());
+    BlueSystemMessage(m_session, "Modifying skill line %u. Advancing %u times.", skill, amount);
+    sGMLog.writefromsession(m_session, "used modify skill of %u %u on %s", skill, amount, player_target->GetName());
 
-    if (!plr->_HasSkillLine(skill))
+    if (!player_target->_HasSkillLine(skill))
     {
         SystemMessage(m_session, "Does not have skill line, adding.");
-        plr->_AddSkillLine(skill, 1, 300);
+        player_target->_AddSkillLine(skill, 1, 300);
     }
     else
     {
-        plr->_AdvanceSkillLine(skill, cnt);
+        player_target->_AdvanceSkillLine(skill, amount);
     }
 
     return true;
@@ -616,22 +618,33 @@ bool ChatHandler::HandleGetSkillsInfoCommand(const char *args, WorldSession *m_s
 }
 
 
-bool ChatHandler::HandleRemoveSkillCommand(const char *args, WorldSession *m_session)
+//.character removeskill
+bool ChatHandler::HandleCharRemoveSkillCommand(const char* args, WorldSession* m_session)
 {
-    uint32 skill = 0;
-    char *pSkill = strtok((char*)args, " ");
-    if (!pSkill)
-        return false;
-    else
-        skill = atol(pSkill);
-    BlueSystemMessage(m_session, "Removing skill line %d", skill);
-
-    Player *plr = getSelectedChar(m_session, true);
-    if (plr && plr->_HasSkillLine(skill)) //fix bug; removing skill twice will mess up skills
+    if (!args)
     {
-        plr->_RemoveSkillLine(skill);
-        sGMLog.writefromsession(m_session, "used remove skill of %u on %s", skill, plr->GetName());
-        SystemMessageToPlr(plr, "%s removed skill line %d from you. ", m_session->GetPlayer()->GetName(), skill);
+        RedSystemMessage(m_session, "Command must be at least in format: .character removeskill <skillid>.");
+        return true;
+    }
+
+    uint32 skill = atoi(args);
+    if (skill == 0)
+    {
+        RedSystemMessage(m_session, "%u is not a valid skill!", skill);
+        return true;
+    }
+
+    auto player_target = GetSelectedPlayer(m_session, true, true);
+    if (player_target == nullptr)
+        return true;
+
+    if (player_target->_HasSkillLine(skill))
+    {
+        player_target->_RemoveSkillLine(skill);
+
+        BlueSystemMessage(m_session, "Removing skill line %u", skill);
+        sGMLog.writefromsession(m_session, "used remove skill of %u on %s", skill, player_target->GetName());
+        SystemMessage(player_target->GetSession(), "%s removed skill line %u from you. ", m_session->GetPlayer()->GetName(), skill);
     }
     else
     {
@@ -744,32 +757,35 @@ bool ChatHandler::HandleTriggerCommand(const char* args, WorldSession* m_session
     return true;
 }
 
-bool ChatHandler::HandleUnlearnCommand(const char* args, WorldSession * m_session)
+//.character unlearn
+bool ChatHandler::HandleCharUnlearnCommand(const char* args, WorldSession* m_session)
 {
-    Player * plr = getSelectedChar(m_session, true);
-    if (plr == 0)
+    auto player_target = GetSelectedPlayer(m_session, true, true);
+    if (player_target == nullptr)
         return true;
 
-    uint32 SpellId = atol(args);
-    if (SpellId == 0)
+    uint32 spell_id = atol(args);
+    if (spell_id == 0)
     {
-        RedSystemMessage(m_session, "You must specify a spell id.");
-        return true;
+        spell_id = GetSpellIDFromLink(args);
+        if (spell_id == 0)
+        {
+            RedSystemMessage(m_session, "You must specify a spell id.");
+            return true;
+        }
     }
 
-    sGMLog.writefromsession(m_session, "removed spell %u from %s", SpellId, plr->GetName());
-
-    if (plr->HasSpell(SpellId))
+    sGMLog.writefromsession(m_session, "removed spell %u from %s", spell_id, player_target->GetName());
+    if (player_target->HasSpell(spell_id))
     {
-        GreenSystemMessageToPlr(plr, "Removed spell %u.", SpellId);
-        GreenSystemMessage(m_session, "Removed spell %u from %s.", SpellId, plr->GetName());
-        plr->removeSpell(SpellId, false, false, 0);
+        GreenSystemMessage(player_target->GetSession(), "Removed spell %u.", spell_id);
+        GreenSystemMessage(m_session, "Removed spell %u from %s.", spell_id, player_target->GetName());
+        player_target->removeSpell(spell_id, false, false, 0);
     }
     else
     {
-        RedSystemMessage(m_session, "That player does not have spell %u learnt.", SpellId);
+        RedSystemMessage(m_session, "That player does not have spell %u learnt.", spell_id);
     }
-
     return true;
 }
 
