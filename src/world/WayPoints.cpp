@@ -767,3 +767,30 @@ bool ChatHandler::HandleWayPointWaitCommand(const char* args, WorldSession* m_se
 
     return true;
 }
+
+bool ChatHandler::HandleNpcSelectCommand(const char * args, WorldSession * m_session)
+{
+    Creature * un = NULL;
+    float dist = 999999.0f;
+    float dist2;
+    Player * plr = m_session->GetPlayer();
+    std::set<Object*>::iterator itr;
+    for (itr = plr->GetInRangeSetBegin(); itr != plr->GetInRangeSetEnd(); ++itr)
+    {
+        if ((dist2 = plr->GetDistance2dSq(*itr)) < dist && (*itr)->GetTypeId() == TYPEID_UNIT)
+        {
+            un = ((Creature*)*itr);
+            dist = dist2;
+        }
+    }
+
+    if (!un)
+    {
+        SystemMessage(m_session, "No inrange creatures found.");
+        return true;
+    }
+
+    plr->SetSelection(un->GetGUID());
+    SystemMessage(m_session, "Set selection to " I64FMT " (%s)", un->GetGUID(), un->GetCreatureInfo() ? un->GetCreatureInfo()->Name : "Unknown");
+    return true;
+}
