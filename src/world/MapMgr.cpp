@@ -1480,12 +1480,30 @@ void MapMgr::KillThreadWithCleanup()
 
         if (m_battleground)
         {
+			char msg[1024];
+			std::string input2;
+			input2 = "[SERVER] Battleground Map ID:";
+			input2 += GetMapId();
+			input2 += "Instance ID: ";
+			input2 += GetInstanceID();
+			input2 += " has crashed.";
+			snprintf((char*)msg, 1024, "%s", input2.c_str());
+			sWorld.SendWorldText(msg); // send message
+
             BattlegroundManager.DeleteBattleground(m_battleground);
             sInstanceMgr.DeleteBattlegroundInstance(GetMapId(), GetInstanceID());
         }
 
         if (pInstance)
         {
+			char msg[1024];
+			std::string input2;
+			input2 = "[SERVER] Instance ";
+			input2 += pInstance->m_instanceId;
+			input2 += " has crashed.";
+			snprintf((char*)msg, 1024, "%s", input2.c_str());
+			sWorld.SendWorldText(msg); // send message
+
             // check for a non-raid instance, these expire after 10 minutes.
             if (GetMapInfo()->type == INSTANCE_NONRAID || pInstance->m_isBattleground)
             {
@@ -1500,6 +1518,16 @@ void MapMgr::KillThreadWithCleanup()
         }
         else if (GetMapInfo()->type == INSTANCE_NULL)
         {
+			char msg[1024];
+			std::string input2;
+			input2 = "[SERVER] Continent Map ID:";
+			input2 += GetMapId();
+			input2 += "Instance ID: ";
+			input2 += GetInstanceID();
+			input2 += " has crashed.";
+			snprintf((char*)msg, 1024, "%s", input2.c_str());
+			sWorld.SendWorldText(msg); // send message
+
             uint32 this_mapid = GetMapId();
             sInstanceMgr.m_singleMaps[this_mapid] = NULL;
             //if we are really cocky we try to create a new map instead of the crashed one
