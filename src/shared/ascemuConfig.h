@@ -21,7 +21,7 @@
 #define _ASCEMUCONFIG_H
 
 #ifndef ENABLE_IMPROVED_TICKETSYSTEM
-#define GM_TICKET_MY_MASTER_COMPATIBLE
+//#define GM_TICKET_MY_MASTER_COMPATIBLE
 #endif
 
 
@@ -32,7 +32,7 @@
  * Only recommended under X64 builds, X86 builds will most likely run out of address space.
  * Default: Disabled
  */
-//#define USE_MEMORY_MAPPING_FOR_MAPS
+#define USE_MEMORY_MAPPING_FOR_MAPS
 
 
 /** Enable/Disable achievement mgr
