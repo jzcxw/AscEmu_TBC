@@ -331,10 +331,12 @@ bool ChatHandler::HandleSummonCommand(const char* args, WorldSession *m_session)
         Player * plr = m_session->GetPlayer();
 
         if (plr->GetMapMgr() == chr->GetMapMgr())
-            chr->_Relocate(plr->GetMapId(), plr->GetPosition(), false, false, plr->GetInstanceID());
+			chr->SummonRequest(m_session->GetPlayer()->GetLowGUID(), m_session->GetPlayer()->GetZoneId(), m_session->GetPlayer()->GetMapId(), m_session->GetPlayer()->GetInstanceID(), m_session->GetPlayer()->GetPosition());
+            //chr->_Relocate(plr->GetMapId(), plr->GetPosition(), false, false, plr->GetInstanceID());
         else
         {
-            sEventMgr.AddEvent(chr, &Player::EventPortToGM, plr, 0, 1, 1, 0);
+			chr->SummonRequest(m_session->GetPlayer()->GetLowGUID(), m_session->GetPlayer()->GetZoneId(), m_session->GetPlayer()->GetMapId(), m_session->GetPlayer()->GetInstanceID(), m_session->GetPlayer()->GetPosition());
+            //sEventMgr.AddEvent(chr, &Player::EventPortToGM, plr, 0, 1, 1, 0);
         }
     }
     else
