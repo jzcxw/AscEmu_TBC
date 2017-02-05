@@ -130,7 +130,7 @@ bool HandleAnnounceCommand(BaseConsole * pConsole, int argc, const char * argv[]
         return false;
 
     ConcatArgs(outstr, argc, 0, argv);
-    snprintf(pAnnounce, 1024, "%sConsole: |r%s", MSG_COLOR_LIGHTBLUE, outstr.c_str());
+    snprintf(pAnnounce, 1024, "[SERVER]: %s", outstr.c_str());
     sWorld.SendWorldText(pAnnounce); // send message
     pConsole->Write("Message sent.\r\n");
     return true;
@@ -145,7 +145,7 @@ bool HandleWAnnounceCommand(BaseConsole * pConsole, int argc, const char * argv[
         return false;
 
     ConcatArgs(outstr, argc, 0, argv);
-    snprintf(pAnnounce, 1024, "%sConsole: |r%s", MSG_COLOR_LIGHTBLUE, outstr.c_str());
+	snprintf(pAnnounce, 1024, "[SERVER]: %s", outstr.c_str());
     sWorld.SendWorldWideScreenText(pAnnounce); // send message
     pConsole->Write("Message sent.\r\n");
     return true;
